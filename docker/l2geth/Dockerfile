@@ -1,4 +1,4 @@
-FROM scrolltech/l2geth:scroll-v4.2.8
+FROM scrolltech/l2geth:scroll-v5.0.0
 
 RUN mkdir -p /l2geth/keystore
 
