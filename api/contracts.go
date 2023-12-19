@@ -626,13 +626,13 @@ func NewYul(ctx context.Context, client *ethclient.Client, root *bind.TransactOp
 		return err
 	}
     
-	//if err = storeBlockResultsForTxs(ctx, client, TRACEDATA_DIR_PREFIX+"yul/", name + "_deploy.json", tx); err != nil {
-	//	return err
-	//}
+	if err = storeBlockResultsForTxs(ctx, client, TRACEDATA_DIR_PREFIX+"yul/", name + "_deploy", tx); err != nil {
+		return err
+	}
 
 	tx, err = yul_contract.Test(root)
 	if err != nil {
 		return err
 	}
-	return storeBlockResultsForTxs(ctx, client, TRACEDATA_DIR_PREFIX+"yul/", name + ".json", tx)
+	return storeBlockResultsForTxs(ctx, client, TRACEDATA_DIR_PREFIX+"yul/", name, tx)
 }
