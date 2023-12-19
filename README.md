@@ -38,6 +38,9 @@ make trace_dumper
 
 # `-wrap` add json rpc wrap, in order to get the same struct when called by postman.
 ./bin/trace_dumper -dump erc20 -wrap
+
+# Run the yul tests
+./bin/trace_dumper -dump yuljson -json jsons/yul.json
 ```
 
 ## show trace list
