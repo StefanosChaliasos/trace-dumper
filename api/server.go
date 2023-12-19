@@ -39,4 +39,5 @@ const (
 	FactoryName        = SolType("factory")
 	RouterName         = SolType("router")
 	MulticallName      = SolType("multicall")
+    YulJsonName        = SolType("yuljson")
 )

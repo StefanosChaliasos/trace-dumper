@@ -19,7 +19,8 @@ var (
 	endpoint = flag.String("endpoint", "ws://127.0.0.1:8546", "The endpoint to connect to blockchain node")
 	keystore = flag.String("keystore", "./docker/l2geth/genesis-keystore", "Keystore file path")
 	password = flag.String("password", "scrolltest", "The keystore password")
-	dump     = flag.String("dump", "erc20", "e.g: erc20, native, nft, greeter, sushi, dao, uniswapv2, multi_uniswapv2")
+	dump     = flag.String("dump", "erc20", "e.g: erc20, native, nft, greeter, sushi, dao, uniswapv2, multi_uniswapv2, yuljson")
+    json     = flag.String("json", "", "JSON containing binary code to use")
 )
 
 func init() {
@@ -77,6 +78,8 @@ func main() {
 		err = api.NewUniswapv2(ctx, client, root, auth)
 	case api.MultiUniswapv2Name:
 		err = api.NewMultiUniswapv2(ctx, client, root, auth)
+    case api.YulJsonName:
+        err = api.NewYulJSON(ctx, client, root, *json)
 	default:
 		log.Error("unexpected dump option")
 		return

@@ -8,6 +8,7 @@ import (
 	"math/big"
 	"math/rand"
 	"os"
+    "io/ioutil"
 
 	"github.com/scroll-tech/go-ethereum/accounts/abi/bind"
 	"github.com/scroll-tech/go-ethereum/common"
@@ -26,6 +27,7 @@ import (
 	"tool/contracts/uniswap/router"
 	"tool/contracts/uniswap/weth9"
 	"tool/contracts/vote"
+    "tool/contracts/yul"
 	"tool/utils"
 )
 
@@ -584,4 +586,53 @@ func NewMultiUniswapv2(ctx context.Context, client *ethclient.Client, root, auth
 	}
 
 	return storeBlockResultsForTxs(ctx, client, path, "router-swapExactTokensForTokens", txs...)
+}
+
+func NewYulJSON(ctx context.Context, client *ethclient.Client, root *bind.TransactOpts, jsonbin string) error {
+    // Open our jsonFile
+    jsonFile, err := os.Open(jsonbin)
+    // if we os.Open returns an error then handle it
+    if err != nil {
+        panic("Cannot read JSON file")
+    }
+    byteValue, _ := ioutil.ReadAll(jsonFile)
+    // defer the closing of our jsonFile so that we can parse it later on
+    defer jsonFile.Close()
+
+    result := map[string]string{}
+    err = json.Unmarshal([]byte(byteValue), &result)
+    if err != nil {
+        panic("There was an error decoding the json.")
+    }
+
+    for name, bin := range result {
+        log.Info("Process", "contract name", name)
+        NewYul(ctx, client, root, bin, name)
+    }
+    return nil
+}
+
+func NewYul(ctx context.Context, client *ethclient.Client, root *bind.TransactOpts, bin string, name string) error {
+    if bin != "" {
+        yul.YulBin = bin
+    }
+    if name != "" {
+        name = "yul_" + name
+    } else {
+        name = "yul"
+    }
+	_, tx, yul_contract, err := yul.DeployYul(root, client)
+	if err != nil {
+		return err
+	}
+    
+	//if err = storeBlockResultsForTxs(ctx, client, TRACEDATA_DIR_PREFIX+"yul/", name + "_deploy.json", tx); err != nil {
+	//	return err
+	//}
+
+	tx, err = yul_contract.Test(root)
+	if err != nil {
+		return err
+	}
+	return storeBlockResultsForTxs(ctx, client, TRACEDATA_DIR_PREFIX+"yul/", name + ".json", tx)
 }
